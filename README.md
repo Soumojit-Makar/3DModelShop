@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div align="center">
   <h1><img src="https://gocartshop.in/favicon.ico" width="20" height="20" alt="GoCart Favicon">
    GoCart</h1>
@@ -83,3 +84,6 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+=======
+# 3DModelShop
+>>>>>>> 7f32dadeeadb408f0ad2be54c848ee79eed9da12
