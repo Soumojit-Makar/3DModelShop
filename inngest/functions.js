@@ -10,7 +10,7 @@ export const syncUserCreation = inngest.createFunction(
       data: {
         id: data.id,
         email: data.email_addresses[0]?.email_address || "",
-        name: data.full_name || "",
+        name: `${data.first_name} ${data.last_name}` || "",
         image: data.profile_image_url || "",
       },
     });
