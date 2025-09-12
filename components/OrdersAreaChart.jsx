@@ -2,7 +2,13 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 export default function OrdersAreaChart({ allOrders }) {
-
+     if (!allOrders.length) {
+        return (
+            <div className="w-full max-w-4xl h-[300px] flex items-center justify-center text-slate-500">
+                No order data available
+            </div>
+        )
+    }
     // Group orders by date
     const ordersPerDay = allOrders.reduce((acc, order) => {
         const date = new Date(order.createdAt).toISOString().split('T')[0] // format: YYYY-MM-DD

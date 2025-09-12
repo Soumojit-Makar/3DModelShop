@@ -4,9 +4,10 @@ import { format } from "date-fns"
 import toast from "react-hot-toast"
 import { DeleteIcon } from "lucide-react"
 import { couponDummyData } from "@/assets/assets"
-
+import { useAuth } from "@clerk/nextjs"
+import axios from "axios"
 export default function AdminCoupons() {
-
+    const {getToken}=useAuth();
     const [coupons, setCoupons] = useState([])
 
     const [newCoupon, setNewCoupon] = useState({
@@ -20,12 +21,38 @@ export default function AdminCoupons() {
     })
 
     const fetchCoupons = async () => {
-        setCoupons(couponDummyData)
+        try{
+            const token=await getToken();
+            const {data}=await axios.get('/api/admin/coupon',{
+                headers:{Authorization:`Bearer ${token}`}
+            })
+            setCoupons(data.coupons)
+           
+        }
+        catch(error){
+            console.log(error);
+            toast.error(error?.response?.data?.error||"Failed to fetch coupons")
+        }
+        
     }
 
     const handleAddCoupon = async (e) => {
         e.preventDefault()
-        // Logic to add a coupon
+        try{
+            const token=await getToken();
+            newCoupon.expiresAt=new Date();
+            newCoupon.discount=Number(newCoupon.discount);
+            await axios.post('/api/admin/coupon',{coupon:newCoupon},{
+                headers:{Authorization:`Bearer ${token}`}
+            })
+            toast.success("Coupon added successfully")
+           
+            await fetchCoupons();
+        }catch(error){
+            console.log(error);
+            toast.error(error?.response?.data?.error||"Failed to add coupon")
+        }
+
 
 
     }
@@ -35,7 +62,22 @@ export default function AdminCoupons() {
     }
 
     const deleteCoupon = async (code) => {
-        // Logic to delete a coupon
+        try{
+            const token=await getToken();
+            const conform=window.confirm("Are you sure you want to delete this coupon?")
+            if(!conform) return;
+            await axios.delete(`/api/admin/coupon?code=${code}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            toast.success("Coupon deleted successfully")
+        }
+        catch(error){
+            console.log(error);
+            toast.error(error?.response?.data?.error||"Failed to delete coupon")
+        }
+        finally{
+            await fetchCoupons();
+        }
 
 
     }

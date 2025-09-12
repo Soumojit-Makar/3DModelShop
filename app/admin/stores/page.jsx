@@ -4,25 +4,56 @@ import StoreInfo from "@/components/admin/StoreInfo"
 import Loading from "@/components/Loading"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useAuth,useUser } from "@clerk/nextjs"
+import axios from "axios"
 
 export default function AdminStores() {
+    const {getToken}=useAuth();
+    const {user}=useUser();
 
     const [stores, setStores] = useState([])
     const [loading, setLoading] = useState(true)
 
     const fetchStores = async () => {
-        setStores(storesDummyData)
-        setLoading(false)
+        try{
+            const token=await getToken();
+            const {data}=await axios.get('/api/admin/stores',{
+                headers:{Authorization:`Bearer ${token}`}
+            })
+            setStores(data.stores)
+        }catch(error){
+            console.log(error?.response?.data?.error);
+            toast.error(error?.response?.data?.error||"Failed to fetch stores")
+        }finally{
+            setLoading(false)
+        }
+
     }
 
     const toggleIsActive = async (storeId) => {
-        // Logic to toggle the status of a store
+        try{
+            const token=await getToken();
+            const store = stores.find((s) => s.id === storeId);
+            const newStatus = !store.isActive;
+            await axios.post('/api/admin/toggle-store',{storeId},{
+                headers:{Authorization:`Bearer ${token}`}
+            })
+            toast.success("Store status updated successfully")
+
+        }
+        catch(error){
+            console.log(error);
+            toast.error(error?.response?.data?.error||"Failed to update store status")
+        }
+        finally{
+            await fetchStores();
+        }
 
     }
 
     useEffect(() => {
-        fetchStores()
-    }, [])
+        if(user){fetchStores()}
+    }, [user])
 
     return !loading ? (
         <div className="text-slate-500 mb-28">
